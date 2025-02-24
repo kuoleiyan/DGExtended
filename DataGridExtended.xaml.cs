@@ -16,7 +16,7 @@ namespace DGExtend
         {
             InitializeComponent();
             Loaded += DataGrid_Loaded;
-            Footers.Clear();
+            Footers = new();
             var dpd = DependencyPropertyDescriptor.FromProperty(ItemsControl.ItemsSourceProperty, typeof(DataGrid));
             dpd.AddValueChanged(this, OnItemsSourceChanged!);
         }
@@ -47,16 +47,37 @@ namespace DGExtend
             ItemsSourceChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        //public static readonly DependencyProperty FootersProperty = DependencyProperty.Register(
+        //    "Footers",
+        //    typeof(ObservableCollection<DataGridColumnFooter>),
+        //    typeof(DataGridEx),
+        //    new PropertyMetadata(new ObservableCollection<DataGridColumnFooter>())
+        //    );
+
+        //public ObservableCollection<DataGridColumnFooter> Footers
+        //{
+        //    get => (ObservableCollection<DataGridColumnFooter>)GetValue(FootersProperty);
+        //}
+
         public static readonly DependencyProperty FootersProperty = DependencyProperty.Register(
             "Footers",
             typeof(ObservableCollection<DataGridColumnFooter>),
             typeof(DataGridEx),
-            new PropertyMetadata(new ObservableCollection<DataGridColumnFooter>())
-            );
+            new PropertyMetadata(null, OnFootersPropertyChanged)
+        );
+
+        private static void OnFootersPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue == null)
+            {
+                ((DataGridEx)d).SetValue(FootersProperty, new ObservableCollection<DataGridColumnFooter>());
+            }
+        }
 
         public ObservableCollection<DataGridColumnFooter> Footers
         {
             get => (ObservableCollection<DataGridColumnFooter>)GetValue(FootersProperty);
+            set => SetValue(FootersProperty, value);
         }
 
         internal DataGridColumnFootersPresenter? FootersPresenter;
